@@ -1,0 +1,4 @@
+.suggestions-container {
+    max-height: 200px; /* Defina a altura desejada */
+    overflow-y: scroll;
+  }
