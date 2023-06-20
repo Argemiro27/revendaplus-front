@@ -1,4 +1,5 @@
-.suggestions-container {
+.autocomplete-list {
     max-height: 200px; /* Defina a altura desejada */
     overflow-y: scroll;
+    background-color: rgb(116, 116, 116);
   }

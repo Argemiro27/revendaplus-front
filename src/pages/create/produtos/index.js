@@ -2,14 +2,17 @@ import React from "react";
 import { Container, Form, Card } from "react-bootstrap";
 import { Button } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
-import SearchProdutos from "../../../services/api/Produtos/produtos";
+import SearchProdutos from "../../../services/Produtos/searchProdutos";
 import "./style.css";
 import { useState } from "react";
 import axios from "axios";
+import { saveProduto } from "../../../services/api/api";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function CreateProduto() {
   const [selectedProduct, setSelectedProduct] = useState("");
-  const [precoUnit, setPrecoUnit] = useState("");
+  const [precoUnitCompra, setPrecoUnitCompra] = useState("");
   const [quantidade, setQuantidade] = useState("");
   const [precoTotalCompra, setPrecoTotalCompra] = useState("");
   const [categoria, setCategoria] = useState("");
@@ -17,19 +20,6 @@ function CreateProduto() {
   const [precoVenda, setPrecoVenda] = useState("");
   const [codigoSKU, setCodigoSKU] = useState("");
   const [imagemProduto, setImagemProduto] = useState("");
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    // Perform actions with the selected product, purchase price, and category
-    console.log("Produto selecionado:", selectedProduct);
-    console.log("Preço unitário:", precoUnit);
-    console.log("Categoria:", categoria);
-    console.log("Taxa de lucro:", taxaLucro);
-    console.log("Preço de venda:", precoVenda);
-    console.log("Código/SKU:", codigoSKU);
-    console.log("Quantidade:", quantidade);
-    console.log("Preço total:", precoTotalCompra);
-  };
 
   const handleProdutoChange = async (product) => {
     setSelectedProduct(product);
@@ -48,7 +38,7 @@ function CreateProduto() {
       const categoriaId = data.results[0]?.category_id || "";
       const productId = data.results[0]?.id || "";
 
-      setPrecoUnit(preco.toString());
+      setPrecoUnitCompra(preco.toString());
 
       // Fetch the category details using the category ID
       const categoriaResponse = await axios.get(
@@ -73,22 +63,54 @@ function CreateProduto() {
     }
   };
 
-  const handlePrecoUnitChange = (event) => {
-    setPrecoUnit(event.target.value);
+  
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const currentDate = new Date();
+
+    const produto = {
+      id: 0, // Valor apropriado para o ID do produto, ou você pode removê-lo se for gerado automaticamente pelo servidor
+      nome_produto: selectedProduct,
+      categoria: categoria,
+      taxa_lucro: taxaLucro,
+      preco_unit_compra: precoUnitCompra,
+      preco_venda: precoVenda,
+      sku: codigoSKU,
+      quantidade: quantidade,
+      preco_total_compra: precoTotalCompra,
+      data_hora: currentDate.toISOString(),
+    };
+
+    try {
+      console.log("Enviando produto:", produto);
+
+      const response = await saveProduto(produto);
+      console.log("Resposta da API:", response);
+
+      console.log("Produto salvo com sucesso");
+      toast.success("Produto salvo com sucesso!");
+    } catch (error) {
+      console.error("Erro ao salvar o produto:", error);
+      toast.error("Erro ao salvar o produto!");
+    }
+  };
+
+  const handlePrecoUnitCompraChange = (event) => {
+    setPrecoUnitCompra(event.target.value);
     calculatePrecoVenda(event.target.value, taxaLucro);
     calculatePrecoTotal(event.target.value, quantidade);
   };
   const handleQuantidadeChange = (event) => {
     setQuantidade(event.target.value);
-    calculatePrecoTotal(precoUnit, event.target.value);
+    calculatePrecoTotal(precoUnitCompra, event.target.value);
   };
 
-  const calculatePrecoTotal = (precoUnit, quantidade) => {
-    const precoUnitFloat = parseFloat(precoUnit);
+  const calculatePrecoTotal = (precoUnitCompra, quantidade) => {
+    const precoUnitCompraFloat = parseFloat(precoUnitCompra);
     const quantidadeInt = parseInt(quantidade);
 
-    if (!isNaN(precoUnitFloat) && !isNaN(quantidadeInt)) {
-      const valorTotalFloat = precoUnitFloat * quantidadeInt;
+    if (!isNaN(precoUnitCompraFloat) && !isNaN(quantidadeInt)) {
+      const valorTotalFloat = precoUnitCompraFloat * quantidadeInt;
       setPrecoTotalCompra(valorTotalFloat.toFixed(2).toString());
     } else {
       setPrecoTotalCompra("");
@@ -101,16 +123,16 @@ function CreateProduto() {
 
   const handleTaxaLucroChange = (event) => {
     setTaxaLucro(event.target.value);
-    calculatePrecoVenda(precoUnit, event.target.value);
+    calculatePrecoVenda(precoUnitCompra, event.target.value);
   };
 
-  const calculatePrecoVenda = (precoUnit, taxaLucro) => {
-    const precoUnitFloat = parseFloat(precoUnit);
+  const calculatePrecoVenda = (precoUnitCompra, taxaLucro) => {
+    const precoUnitCompraFloat = parseFloat(precoUnitCompra);
     const taxaLucroFloat = parseFloat(taxaLucro);
 
-    if (!isNaN(precoUnitFloat) && !isNaN(taxaLucroFloat)) {
-      const lucro = (precoUnitFloat * taxaLucroFloat) / 100;
-      const precoVendaFloat = precoUnitFloat + lucro;
+    if (!isNaN(precoUnitCompraFloat) && !isNaN(taxaLucroFloat)) {
+      const lucro = (precoUnitCompraFloat * taxaLucroFloat) / 100;
+      const precoVendaFloat = precoUnitCompraFloat + lucro;
       setPrecoVenda(precoVendaFloat.toFixed(2).toString());
     } else {
       setPrecoVenda("");
@@ -124,6 +146,7 @@ function CreateProduto() {
   return (
     <div className="main-content">
       <Container>
+        <ToastContainer />
         <Card className="formwrapper">
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3" controlId="formBasicNome">
@@ -138,7 +161,11 @@ function CreateProduto() {
                 <img
                   src={imagemProduto}
                   alt="Produto"
-                  style={{ width: "200px", height: "200px" }}
+                  style={{
+                    width: "auto",
+                    height: "150px",
+                    backgroundSize: "cover",
+                  }}
                 />
               )}
             </Form.Group>
@@ -171,8 +198,8 @@ function CreateProduto() {
               <Form.Label>Preço unitário:</Form.Label>
               <Form.Control
                 type="text"
-                value={precoUnit}
-                onChange={handlePrecoUnitChange}
+                value={precoUnitCompra}
+                onChange={handlePrecoUnitCompraChange}
                 disabled
               />
             </Form.Group>
@@ -204,6 +231,7 @@ function CreateProduto() {
                 disabled
               />
             </Form.Group>
+
 
             <Button
               variant="contained"

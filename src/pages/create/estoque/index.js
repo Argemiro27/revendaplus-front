@@ -4,13 +4,13 @@ import { Button } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
-import { saveVenda } from "../../../services/api/api";
+import { saveItem } from "../../../services/api/api";
 
-function CreateVenda() {
+function CreateItem() {
   const [produtos, setProdutos] = useState([]);
   const [id_produto, setIdProduto] = useState([]);
-  const [quant_vendida, setQuantVendida] = useState([]);
-  const [descricao, setDescricao] = useState([]);
+  const [quant_estoque, setQuantEstoque] = useState([]);
+
   useEffect(() => {
     fetchProdutos();
   }, []);
@@ -28,36 +28,30 @@ function CreateVenda() {
     setIdProduto(event.target.value);
   };
 
-  const handleQuantVendida = (event) => {
-    setQuantVendida(event.target.value);
-  };
-
-  const handleDescricao = (event) => {
-    setDescricao(event.target.value);
+  const handleQuantEstoque = (event) => {
+    setQuantEstoque(event.target.value);
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const currentDate = new Date();
-    const venda = {
+
+    const item = {
       id: 0,
       id_produto: id_produto,
-      quant_vendida: quant_vendida,
-      descricao: descricao,
-      data_hora: currentDate.toISOString(),
+      quant_estoque: quant_estoque,
     };
 
     try {
-      console.log("Cadastrando venda:", venda);
+      console.log("Enviando item:", item);
 
-      const response = await saveVenda(venda);
+      const response = await saveItem(item);
       console.log("Resposta da API:", response);
 
-      console.log("Venda cadastrada com sucesso");
-      toast.success("Venda cadastrada com sucesso!");
+      console.log("Item salvo com sucesso");
+      toast.success("Item salvo com sucesso!");
     } catch (error) {
-      console.error("Erro ao cadastrar venda:", error);
-      toast.error("Erro ao cadastrar venda!");
+      console.error("Erro ao salvar o item:", error);
+      toast.error("Erro ao salvar o item!");
     }
   };
   return (
@@ -85,23 +79,13 @@ function CreateVenda() {
               </Form.Control>
             </Form.Group>
 
-            <Form.Group className="mb-3" controlId="formBasicQuantVendida">
-              <Form.Label>Quantidade vendida:</Form.Label>
+            <Form.Group className="mb-3" controlId="formBasicQuantEstoque">
+              <Form.Label>Quantidade em estoque:</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Digite a quantidade vendida"
-                value={quant_vendida}
-                onChange={handleQuantVendida}
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3" controlId="formBasicDescricao">
-              <Form.Label>Descrição:</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Digite uma descrição"
-                value={descricao}
-                onChange={handleDescricao}
+                placeholder="Digite a quantidade em estoque"
+                value={quant_estoque}
+                onChange={handleQuantEstoque}
               />
             </Form.Group>
 
@@ -120,4 +104,4 @@ function CreateVenda() {
   );
 }
 
-export default CreateVenda;
+export default CreateItem;

@@ -23,8 +23,15 @@ function Cadastros() {
           </li>
           <li className="nav-item">
             <a className="nav-link text-truncate" href="/produtos">
+              <i className="fa-solid fa-truck"></i>{" "}
+              <span className="d-none d-sm-inline">COMPRAS</span>
+            </a>
+          </li>
+
+          <li className="nav-item">
+            <a className="nav-link text-truncate" href="/estoque">
               <i className="fa-solid fa-boxes-stacked"></i>{" "}
-              <span className="d-none d-sm-inline">PRODUTOS</span>
+              <span className="d-none d-sm-inline">ESTOQUE</span>
             </a>
           </li>
           <li className="nav-item">

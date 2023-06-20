@@ -13,6 +13,8 @@ import Vendas from "./pages/vendas";
 import Produtos from "./pages/produtos";
 import CreateProduto from "./pages/create/produtos";
 import CreateVenda from "./pages/create/vendas";
+import Estoque from "./pages/estoque";
+import CreateItem from "./pages/create/estoque";
 
 const Layout = () => {
   return (
@@ -30,6 +32,8 @@ const Layout = () => {
               <Route path="/produtos" element={<Produtos />} />
               <Route path="/vendas/create" element={<CreateVenda />} />
               <Route path="/produtos/create" element={<CreateProduto />} />
+              <Route path="/estoque" element={<Estoque />} />
+              <Route path="/estoque/create" element={<CreateItem/>} />
             </Routes>
           </div>
         </div>

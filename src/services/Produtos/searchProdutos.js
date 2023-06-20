@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { Form } from "react-bootstrap";
 import axios from "axios";
 import PropTypes from "prop-types";
+import './style.css';
+
+
 
 function SearchProdutos({ onSelected }) {
   const [searchText, setSearchText] = useState("");
@@ -17,7 +20,7 @@ function SearchProdutos({ onSelected }) {
       );
       const data = response.data;
 
-      const suggestions = data.results.map((result) => result.title);
+      const suggestions = data.results.map((result) => result.title).slice(0, 5); // Adjust the number (5) to limit the suggestions
       setFilteredSuggestions(suggestions);
     } catch (error) {
       console.error("Erro ao buscar sugestões:", error);

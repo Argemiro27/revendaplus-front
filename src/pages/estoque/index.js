@@ -19,28 +19,28 @@ const fetchNomesProdutos = async (produtoIds) => {
   }
 };
 
-function Vendas() {
-  const [vendas, setVendas] = useState([]);
+function Estoque() {
+  const [itensEstoque, setItensEstoque] = useState([]);
 
   useEffect(() => {
-    fetchVendas();
+    fetchItensEstoque();
   }, []);
 
-  const fetchVendas = async () => {
+  const fetchItensEstoque = async () => {
     try {
-      const response = await axios.get("https://localhost:44360/api/Venda");
-      setVendas(response.data);
+      const response = await axios.get("https://localhost:44360/api/Estoque");
+      setItensEstoque(response.data);
 
       // Obtenha os nomes dos produtos com base nos IDs dos produtos
       const produtoIds = response.data.map((item) => item.id_produto);
       const nomesProdutos = await fetchNomesProdutos(produtoIds);
 
       // Atualize o estado dos itens de estoque com os nomes dos produtos
-      const vendasAtualizadas = response.data.map((item, index) => ({
+      const itensEstoqueAtualizados = response.data.map((item, index) => ({
         ...item,
         nome_produto: nomesProdutos[index]
       }));
-      setVendas(vendasAtualizadas);
+      setItensEstoque(itensEstoqueAtualizados);
     } catch (error) {
       console.error("Erro ao buscar os itens:", error);
     }
@@ -48,8 +48,8 @@ function Vendas() {
 
   const deleteItem = async (id) => {
     try {
-      await axios.delete(`https://localhost:44360/api/Venda/${id}`);
-      fetchVendas(); // Atualize os itens de estoque após excluir um produto
+      await axios.delete(`https://localhost:44360/api/Estoque/${id}`);
+      fetchItensEstoque(); // Atualize os itens de estoque após excluir um produto
       console.log("Produto excluído com sucesso!");
     } catch (error) {
       console.error("Erro ao excluir o produto:", error);
@@ -58,36 +58,32 @@ function Vendas() {
   return (
     <div className="main-content">
       <Container>
-        <a href="/vendas/create">
+        <a href="/estoque/create">
           <Button
             variant="contained"
             className="mb-3"
             color="success"
             startIcon={<AddBoxIcon />}
           >
-            Nova venda
+            Novo item
           </Button>
         </a>
         <Table responsive="sm">
           <thead>
             <tr>
               <th>#</th>
-              <th>Data/ Hora</th>
               <th>Nome do produto</th>
-              <th>Quantidade vendida</th>
-              <th>Descrição</th>
+              <th>Quantidade em estoque</th>
               <th></th>
               <th></th>
             </tr>
           </thead>
           <tbody>
-            {vendas.map((item) => (
+            {itensEstoque.map((item) => (
               <tr key={item.id}>
                 <td>{item.id}</td>
-                <td>{item.data_hora}</td>
                 <td>{item.nome_produto}</td>
-                <td>{item.quant_vendida}</td>
-                <td>{item.descricao}</td>
+                <td>{item.quant_estoque}</td>
                 <td>
                   <Button variant="contained" color="success">
                     <i className="fa-solid fa-pencil"></i>
@@ -111,4 +107,4 @@ function Vendas() {
   );
 }
 
-export default Vendas;
+export default Estoque;
